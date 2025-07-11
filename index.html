@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Planner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-lg">
+            <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    <h1 class="text-2xl font-bold">StudyFlow</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="hidden md:flex items-center space-x-2">
+                        <span id="current-date" class="font-medium"></span>
+                    </div>
+                    <button id="notification-toggle" class="p-2 rounded-full hover:bg-blue-700 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                    </button>
+                    <div class="relative">
+                        <button id="user-menu" class="flex items-center space-x-2 focus:outline-none">
+                            <div class="w-8 h-8 rounded-full bg-white text-blue-700 flex items-center justify-center font-bold">
+                                S
+                            </div>
+                            <span class="hidden md:inline font-medium">Student</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="flex-grow flex flex-col md:flex-row">
+            <!-- Sidebar -->
+            <aside class="bg-white shadow-md w-full md:w-64 md:min-h-screen">
+                <nav class="p-4">
+                    <div class="mb-6">
+                        <h2 class="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">Dashboard</h2>
+                        <ul class="space-y-1">
+                            <li>
+                                <button id="view-today" class="flex items-center space-x-3 w-full px-3 py-2 rounded-lg bg-blue-50 text-blue-700">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span>Today</span>
+                                </button>
+                            </li>
+                            <li>
+                                <button id="view-week" class="flex items-center space-x-3 w-full px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                    </svg>
+                                    <span>Weekly View</span>
+                                </button>
+                            </li>
+                            <li>
+                                <button id="view-progress" class="flex items-center space-x-3 w-full px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                    </svg>
+                                    <span>Progress</span>
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between mb-2">
+                            <h2 class="text-xs font-semibold text-gray-600 uppercase tracking-wide">Subjects</h2>
+                            <button id="add-subject" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                + Add
+                            </button>
+                        </div>
+                        <ul id="subject-list" class="space-y-1">
+                            <!-- Subject list will be populated here -->
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h2 class="text-xs font-semibold text-gray-600 uppercase tracking-wide">Study Sessions</h2>
+                            <button id="add-session" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                + Add
+                            </button>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <div id="upcoming-sessions" class="space-y-2">
+                                <!-- Study sessions will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="flex-grow p-4 md:p-6 overflow-auto">
+                <!-- Today View (Default) -->
+                <div id="today-view" class="space-y-6">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                        <h1 class="text-2xl font-bold text-gray-800">Today's Schedule</h1>
+                        <div class="mt-2 md:mt-0">
+                            <button id="add-task" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                                <span>Add Task</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Tasks Summary Card -->
+                        <div class="bg-white rounded-xl shadow-md p-5">
+                            <h2 class="text-lg font-semibold text-gray-800 mb-4">Tasks Summary</h2>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-sm text-gray-500">Today's Tasks</p>
+                                    <p id="today-task-count" class="text-2xl font-bold text-gray-800">0</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Completed</p>
+                                    <p id="completed-task-count" class="text-2xl font-bold text-green-600">0</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Pending</p>
+                                    <p id="pending-task-count" class="text-2xl font-bold text-orange-500">0</p>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div id="task-progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                                </div>
+                                <p id="task-progress-text" class="text-xs text-gray-500 mt-1 text-right">0% complete</p>
+                            </div>
+                        </div>
+
+                        <!-- Time Allocation Card -->
+                        <div class="bg-white rounded-xl shadow-md p-5">
+                            <h2 class="text-lg font-semibold text-gray-800 mb-4">Study Time Today</h2>
+                            <div class="flex items-center justify-center h-32">
+                                <div class="relative inline-flex">
+                                    <svg class="w-32 h-32">
+                                        <circle class="text-gray-200" stroke-width="10" stroke="currentColor" fill="transparent" r="58" cx="64" cy="64"/>
+                                        <circle id="study-time-circle" class="text-blue-600 progress-ring-circle" stroke-width="10" stroke-dasharray="364" stroke-dashoffset="364" stroke="currentColor" fill="transparent" r="58" cx="64" cy="64"/>
+                                    </svg>
+                                    <div class="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center">
+                                        <span id="study-time-hours" class="text-3xl font-bold text-gray-800">0</span>
+                                        <span class="text-sm text-gray-500">hours</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-center mt-2">
+                                <p id="study-time-goal" class="text-sm text-gray-500">Goal: 4 hours</p>
+                            </div>
+                        </div>
+
+                        <!-- Priority Focus Card -->
+                        <div class="bg-white rounded-xl shadow-md p-5">
+                            <h2 class="text-lg font-semibold text-gray-800 mb-4">Priority Focus</h2>
+                            <div id="priority-tasks" class="space-y-3">
+                                <p class="text-gray-500 text-sm italic text-center py-6">No high priority tasks for today</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tasks List -->
+                    <div class="bg-white rounded-xl shadow-md p-5">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold text-gray-800">Today's Tasks</h2>
+                            <div class="flex space-x-2">
+                                <select id="task-filter" class="text-sm border rounded-md px-2 py-1 text-gray-700">
+                                    <option value="all">All Tasks</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                                <select id="task-sort" class="text-sm border rounded-md px-2 py-1 text-gray-700">
+                                    <option value="priority">Sort by Priority</option>
+                                    <option value="time">Sort by Time</option>
+                                    <option value="subject">Sort by Subject</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="tasks-container" class="space-y-2 max-h-96 overflow-y-auto custom-scrollbar">
+                            <!-- Tasks will be populated here -->
+                            <p class="text-gray-500 text-sm italic text-center py-6">No tasks scheduled for today</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weekly View -->
+                <div id="weekly-view" class="space-y-6 hidden">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                        <h1 class="text-2xl font-bold text-gray-800">Weekly Schedule</h1>
+                        <div class="flex space-x-2 mt-2 md:mt-0">
+                            <button id="prev-week" class="bg-gray-100 hover:bg-gray-200 text-gray-700 p-2 rounded-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                </svg>
+                            </button>
+                            <span id="week-range" class="bg-white px-4 py-2 rounded-lg shadow text-gray-700 font-medium"></span>
+                            <button id="next-week" class="bg-gray-100 hover:bg-gray-200 text-gray-700 p-2 rounded-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Calendar View -->
+                    <div class="bg-white rounded-xl shadow-md p-5">
+                        <div class="grid grid-cols-7 gap-1 mb-2">
+                            <div class="text-center text-gray-500 font-medium">Sun</div>
+                            <div class="text-center text-gray-500 font-medium">Mon</div>
+                            <div class="text-center text-gray-500 font-medium">Tue</div>
+                            <div class="text-center text-gray-500 font-medium">Wed</div>
+                            <div class="text-center text-gray-500 font-medium">Thu</div>
+                            <div class="text-center text-gray-500 font-medium">Fri</div>
+                            <div class="text-center text-gray-500 font-medium">Sat</div>
+                        </div>
+                        <div id="calendar-days" class="grid grid-cols-7 gap-1">
+                            <!-- Calendar days will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Weekly Tasks -->
+                    <div class="bg-white rounded-xl shadow-md p-5">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Weekly Tasks</h2>
+                        <div id="weekly-tasks-container" class="space-y-4">
+                            <!-- Weekly tasks will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress View -->
+                <div id="progress-view" class="space-y-6 hidden">
+                    <h1 class="text-2xl font-bold text-gray-800">Progress Tracking</h1>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Completion Rate -->
+                        <div class="bg-white rounded-xl shadow-md p-5">
+                            <h2 class="text-lg font-semibold text-gray-800 mb-4">Task Completion Rate</h2>
+                            <div class="h-64">
+                                <canvas id="completion-chart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- Subject Distribution -->
+                        <div class="bg-white rounded-xl shadow-md p-5">
+                            <h2 class="text-lg font-semibold text-gray-800 mb-4">Study Time by Subject</h2>
+                            <div class="h-64">
+                                <canvas id="subjects-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Achievement Stats -->
+                    <div class="bg-white rounded-xl shadow-md p-5">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Study Achievements</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="bg-blue-50 rounded-lg p-4 text-center">
+                                <div class="text-blue-600 mb-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <p class="text-sm text-gray-600">Tasks Completed</p>
+                                <p id="total-completed" class="text-2xl font-bold text-gray-800">0</p>
+                            </div>
+                            <div class="bg-green-50 rounded-lg p-4 text-center">
+                                <div class="text-green-600 mb-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <p class="text-sm text-gray-600">Study Hours</p>
+                                <p id="total-hours" class="text-2xl font-bold text-gray-800">0</p>
+                            </div>
+                            <div class="bg-purple-50 rounded-lg p-4 text-center">
+                                <div class="text-purple-600 mb-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
+                                </div>
+                                <p class="text-sm text-gray-600">Productivity Score</p>
+                                <p id="productivity-score" class="text-2xl font-bold text-gray-800">0</p>
+                            </div>
+                            <div class="bg-yellow-50 rounded-lg p-4 text-center">
+                                <div class="text-yellow-600 mb-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                    </svg>
+                                </div>
+                                <p class="text-sm text-gray-600">Current Streak</p>
+                                <p id="current-streak" class="text-2xl font-bold text-gray-800">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Add Task Modal -->
+    <div id="add-task-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4 fade-in">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800">Add New Task</h2>
+                <button class="close-modal text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form id="add-task-form" class="space-y-4">
+                <div>
+                    <label for="task-title" class="block text-sm font-medium text-gray-700 mb-1">Task Title</label>
+                    <input type="text" id="task-title" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label for="task-subject" class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                    <select id="task-subject" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <!-- Will be populated with subjects -->
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="task-date" class="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
+                        <input type="date" id="task-date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="task-time" class="block text-sm font-medium text-gray-700 mb-1">Time</label>
+                        <input type="time" id="task-time" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                <div>
+                    <label for="task-priority" class="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                    <select id="task-priority" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="high">High</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="task-description" class="block text-sm font-medium text-gray-700 mb-1">Description (Optional)</label>
+                    <textarea id="task-description" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+                <div>
+                    <label for="task-estimated-time" class="block text-sm font-medium text-gray-700 mb-1">Estimated Time (minutes)</label>
+                    <input type="number" id="task-estimated-time" min="5" step="5" value="30" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" class="close-modal px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Add Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Subject Modal -->
+    <div id="add-subject-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4 fade-in">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800">Add New Subject</h2>
+                <button class="close-modal text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form id="add-subject-form" class="space-y-4">
+                <div>
+                    <label for="subject-name" class="block text-sm font-medium text-gray-700 mb-1">Subject Name</label>
+                    <input type="text" id="subject-name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label for="subject-color" class="block text-sm font-medium text-gray-700 mb-1">Color</label>
+                    <div class="grid grid-cols-6 gap-2">
+                        <div class="color-option bg-red-500 h-8 rounded-md cursor-pointer" data-color="red-500"></div>
+                        <div class="color-option bg-orange-500 h-8 rounded-md cursor-pointer" data-color="orange-500"></div>
+                        <div class="color-option bg-yellow-500 h-8 rounded-md cursor-pointer" data-color="yellow-500"></div>
+                        <div class="color-option bg-green-500 h-8 rounded-md cursor-pointer" data-color="green-500"></div>
+                        <div class="color-option bg-blue-500 h-8 rounded-md cursor-pointer" data-color="blue-500"></div>
+                        <div class="color-option bg-purple-500 h-8 rounded-md cursor-pointer" data-color="purple-500"></div>
+                        <div class="color-option bg-pink-500 h-8 rounded-md cursor-pointer" data-color="pink-500"></div>
+                        <div class="color-option bg-indigo-500 h-8 rounded-md cursor-pointer" data-color="indigo-500"></div>
+                        <div class="color-option bg-teal-500 h-8 rounded-md cursor-pointer" data-color="teal-500"></div>
+                        <div class="color-option bg-cyan-500 h-8 rounded-md cursor-pointer" data-color="cyan-500"></div>
+                        <div class="color-option bg-lime-500 h-8 rounded-md cursor-pointer" data-color="lime-500"></div>
+                        <div class="color-option bg-amber-500 h-8 rounded-md cursor-pointer" data-color="amber-500"></div>
+                    </div>
+                    <input type="hidden" id="subject-color" value="blue-500" required>
+                </div>
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" class="close-modal px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Add Subject</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Study Session Modal -->
+    <div id="add-session-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4 fade-in">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800">Add Study Session</h2>
+                <button class="close-modal text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form id="add-session-form" class="space-y-4">
+                <div>
+                    <label for="session-subject" class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                    <select id="session-subject" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <!-- Will be populated with subjects -->
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="session-date" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                        <input type="date" id="session-date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="session-time" class="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
+                        <input type="time" id="session-time" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                </div>
+                <div>
+                    <label for="session-duration" class="block text-sm font-medium text-gray-700 mb-1">Duration (minutes)</label>
+                    <input type="number" id="session-duration" min="15" step="15" value="60" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label for="session-notes" class="block text-sm font-medium text-gray-700 mb-1">Notes (Optional)</label>
+                    <textarea id="session-notes" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" class="close-modal px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Add Session</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Task Details Modal -->
+    <div id="task-details-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4 fade-in">
+            <div class="flex justify-between items-center mb-4">
+                <h2 id="detail-task-title" class="text-xl font-bold text-gray-800">Task Details</h2>
+                <button class="close-modal text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div class="flex items-center space-x-2">
+                    <span id="detail-subject-badge" class="px-2 py-1 rounded-full text-xs font-medium"></span>
+                    <span id="detail-priority-badge" class="px-2 py-1 rounded-full text-xs font-medium"></span>
+                </div>
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500">Due Date & Time</h3>
+                    <p id="detail-datetime" class="text-gray-800"></p>
+                </div>
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500">Description</h3>
+                    <p id="detail-description" class="text-gray-800"></p>
+                </div>
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500">Estimated Time</h3>
+                    <p id="detail-estimated-time" class="text-gray-800"></p>
+                </div>
+                <div class="pt-2 flex justify-between">
+                    <button id="edit-task-btn" class="px-3 py-2 bg-blue-50 text-blue-700 rounded-md hover:bg-blue-100 flex items-center space-x-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        <span>Edit</span>
+                    </button>
+                    <button id="delete-task-btn" class="px-3 py-2 bg-red-50 text-red-700 rounded-md hover:bg-red-100 flex items-center space-x-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        <span>Delete</span>
+                    </button>
+                    <button id="complete-task-btn" class="px-3 py-2 bg-green-50 text-green-700 rounded-md hover:bg-green-100 flex items-center space-x-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>Complete</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification bg-white rounded-lg shadow-lg p-4 max-w-sm hidden">
+        <div class="flex items-center">
+            <div class="flex-shrink-0 bg-blue-100 rounded-full p-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-gray-900" id="notification-title">Reminder</h3>
+                <p class="text-sm text-gray-500" id="notification-message"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize data
+        let subjects = [
+            { id: 1, name: 'Mathematics', color: 'blue-500' },
+            { id: 2, name: 'Physics', color: 'red-500' },
+            { id: 3, name: 'Computer Science', color: 'purple-500' },
+            { id: 4, name: 'Literature', color: 'green-500' }
+        ];
+
+        let tasks = [
+            { 
+                id: 1, 
+                title: 'Complete Calculus Assignment', 
+                subject: 1, 
+                date: '2023-06-15', 
+                time: '14:00', 
+                priority: 'high', 
+                description: 'Finish problems 1-20 from Chapter 5', 
+                estimatedTime: 60,
+                completed: false
+            },
+            { 
+                id: 2, 
+                title: 'Read Physics Chapter 7', 
+                subject: 2, 
+                date: '2023-06-15', 
+                time: '16:00', 
+                priority: 'medium', 
+                description: 'Focus on thermodynamics section', 
+                estimatedTime: 45,
+                completed: false
+            },
+            { 
+                id: 3, 
+                title: 'Study for CS Exam', 
+                subject: 3, 
+                date: '2023-06-16', 
+                time: '10:00', 
+                priority: 'high', 
+                description: 'Review algorithms and data structures', 
+                estimatedTime: 120,
+                completed: false
+            }
+        ];
+
+        let studySessions = [
+            {
+                id: 1,
+                subject: 1,
+                date: '2023-06-15',
+                time: '09:00',
+                duration: 60,
+                notes: 'Focus on integration techniques'
+            },
+            {
+                id: 2,
+                subject: 2,
+                date: '2023-06-16',
+                time: '14:00',
+                duration: 90,
+                notes: 'Review quantum mechanics'
+            }
+        ];
+
+        // Stats for demo
+        let stats = {
+            totalCompleted: 24,
+            totalHours: 32,
+            productivityScore: 85,
+            currentStreak: 5,
+            weeklyData: [
+                { day: 'Mon', completed: 5, total: 7 },
+                { day: 'Tue', completed: 4, total: 5 },
+                { day: 'Wed', completed: 6, total: 6 },
+                { day: 'Thu', completed: 3, total: 8 },
+                { day: 'Fri', completed: 4, total: 6 },
+                { day: 'Sat', completed: 2, total: 3 },
+                { day: 'Sun', completed: 0, total: 0 }
+            ],
+            subjectHours: [
+                { subject: 'Mathematics', hours: 12 },
+                { subject: 'Physics', hours: 8 },
+                { subject: 'Computer Science', hours: 7 },
+                { subject: 'Literature', hours: 5 }
+            ]
+        };
+
+        // Current date and view state
+        const today = new Date();
+        let currentDate = new Date();
+        let currentView = 'today';
+        let selectedTaskId = null;
+        let currentWeekStart = new Date(today);
+        currentWeekStart.setDate(today.getDate() - today.getDay());
+
+        // DOM Elements
+        const todayView = document.getElementById('today-view');
+        const weeklyView = document.getElementById('weekly-view');
+        const progressView = document.getElementById('progress-view');
+        const viewTodayBtn = document.getElementById('view-today');
+        const viewWeekBtn = document.getElementById('view-week');
+        const viewProgressBtn = document.getElementById('view-progress');
+        const addTaskBtn = document.getElementById('add-task');
+        const addSubjectBtn = document.getElementById('add-subject');
+        const addSessionBtn = document.getElementById('add-session');
+        const addTaskModal = document.getElementById('add-task-modal');
+        const addSubjectModal = document.getElementById('add-subject-modal');
+        const addSessionModal = document.getElementById('add-session-modal');
+        const taskDetailsModal = document.getElementById('task-details-modal');
+        const closeModalBtns = document.querySelectorAll('.close-modal');
+        const addTaskForm = document.getElementById('add-task-form');
+        const addSubjectForm = document.getElementById('add-subject-form');
+        const addSessionForm = document.getElementById('add-session-form');
+        const colorOptions = document.querySelectorAll('.color-option');
+        const subjectList = document.getElementById('subject-list');
+        const taskSubjectSelect = document.getElementById('task-subject');
+        const sessionSubjectSelect = document.getElementById('session-subject');
+        const tasksContainer = document.getElementById('tasks-container');
+        const upcomingSessions = document.getElementById('upcoming-sessions');
+        const taskFilter = document.getElementById('task-filter');
+        const taskSort = document.getElementById('task-sort');
+        const currentDateEl = document.getElementById('current-date');
+        const weekRangeEl = document.getElementById('week-range');
+        const prevWeekBtn = document.getElementById('prev-week');
+        const nextWeekBtn = document.getElementById('next-week');
+        const calendarDays = document.getElementById('calendar-days');
+        const weeklyTasksContainer = document.getElementById('weekly-tasks-container');
+        const notificationToggle = document.getElementById('notification-toggle');
+        const notification = document.getElementById('notification');
+        const notificationTitle = document.getElementById('notification-title');
+        const notificationMessage = document.getElementById('notification-message');
+        const priorityTasks = document.getElementById('priority-tasks');
+        const editTaskBtn = document.getElementById('edit-task-btn');
+        const deleteTaskBtn = document.getElementById('delete-task-btn');
+        const completeTaskBtn = document.getElementById('complete-task-btn');
+
+        // Initialize the app
+        function init() {
+            // Set current date
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            currentDateEl.textContent = today.toLocaleDateString('en-US', options);
+            
+            // Initialize views
+            updateView();
+            renderSubjects();
+            renderTasks();
+            renderStudySessions();
+            updateTaskCounts();
+            updateStudyTimeProgress();
+            renderPriorityTasks();
+            renderWeekCalendar();
+            renderWeeklyTasks();
+            initCharts();
+            updateStats();
+            
+            // Set up event listeners
+            setupEventListeners();
+        }
+
+        // Update the current view
+        function updateView() {
+            todayView.classList.add('hidden');
+            weeklyView.classList.add('hidden');
+            progressView.classList.add('hidden');
+            
+            viewTodayBtn.classList.remove('bg-blue-50', 'text-blue-700');
+            viewWeekBtn.classList.remove('bg-blue-50', 'text-blue-700');
+            viewProgressBtn.classList.remove('bg-blue-50', 'text-blue-700');
+            
+            viewTodayBtn.classList.add('text-gray-700', 'hover:bg-gray-100');
+            viewWeekBtn.classList.add('text-gray-700', 'hover:bg-gray-100');
+            viewProgressBtn.classList.add('text-gray-700', 'hover:bg-gray-100');
+            
+            if (currentView === 'today') {
+                todayView.classList.remove('hidden');
+                viewTodayBtn.classList.remove('text-gray-700', 'hover:bg-gray-100');
+                viewTodayBtn.classList.add('bg-blue-50', 'text-blue-700');
+            } else if (currentView === 'week') {
+                weeklyView.classList.remove('hidden');
+                viewWeekBtn.classList.remove('text-gray-700', 'hover:bg-gray-100');
+                viewWeekBtn.classList.add('bg-blue-50', 'text-blue-700');
+            } else if (currentView === 'progress') {
+                progressView.classList.remove('hidden');
+                viewProgressBtn.classList.remove('text-gray-700', 'hover:bg-gray-100');
+                viewProgressBtn.classList.add('bg-blue-50', 'text-blue-700');
+            }
+        }
+
+        // Render subjects in sidebar and dropdowns
+        function renderSubjects() {
+            // Clear existing subjects
+            subjectList.innerHTML = '';
+            taskSubjectSelect.innerHTML = '';
+            sessionSubjectSelect.innerHTML = '';
+            
+            // Add subjects to sidebar
+            subjects.forEach(subject => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <button class="flex items-center justify-between w-full px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-${subject.color}"></span>
+                            <span>${subject.name}</span>
+                        </div>
+                    </button>
+                `;
+                subjectList.appendChild(li);
+                
+                // Add to dropdowns
+                const taskOption = document.createElement('option');
+                taskOption.value = subject.id;
+                taskOption.textContent = subject.name;
+                taskSubjectSelect.appendChild(taskOption);
+                
+                const sessionOption = document.createElement('option');
+                sessionOption.value = subject.id;
+                sessionOption.textContent = subject.name;
+                sessionSubjectSelect.appendChild(sessionOption);
+            });
+        }
+
+        // Render tasks based on current filter and sort
+        function renderTasks() {
+            const filter = taskFilter.value;
+            const sort = taskSort.value;
+            
+            // Filter tasks for today
+            let filteredTasks = tasks.filter(task => {
+                const taskDate = new Date(task.date);
+                const today = new Date();
+                return taskDate.toDateString() === today.toDateString();
+            });
+            
+            // Apply additional filters
+            if (filter === 'pending') {
+                filteredTasks = filteredTasks.filter(task => !task.completed);
+            } else if (filter === 'completed') {
+                filteredTasks = filteredTasks.filter(task => task.completed);
+            }
+            
+            // Sort tasks
+            if (sort === 'priority') {
+                const priorityOrder = { 'high': 1, 'medium': 2, 'low': 3 };
+                filteredTasks.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+            } else if (sort === 'time') {
+                filteredTasks.sort((a, b) => {
+                    const timeA = a.time || '23:59';
+                    const timeB = b.time || '23:59';
+                    return timeA.localeCompare(timeB);
+                });
+            } else if (sort === 'subject') {
+                filteredTasks.sort((a, b) => {
+                    const subjectA = subjects.find(s => s.id === a.subject)?.name || '';
+                    const subjectB = subjects.find(s => s.id === b.subject)?.name || '';
+                    return subjectA.localeCompare(subjectB);
+                });
+            }
+            
+            // Render tasks
+            if (filteredTasks.length === 0) {
+                tasksContainer.innerHTML = '<p class="text-gray-500 text-sm italic text-center py-6">No tasks scheduled for today</p>';
+                return;
+            }
+            
+            tasksContainer.innerHTML = '';
+            filteredTasks.forEach(task => {
+                const subject = subjects.find(s => s.id === task.subject);
+                const taskEl = document.createElement('div');
+                taskEl.className = `task-item p-3 rounded-lg border ${task.completed ? 'bg-gray-50 border-gray-200' : `priority-${task.priority}`} cursor-pointer`;
+                taskEl.dataset.id = task.id;
+                
+                let timeDisplay = task.time ? formatTime(task.time) : 'Anytime';
+                
+                taskEl.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="flex-shrink-0">
+                                <input type="checkbox" class="task-checkbox w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" ${task.completed ? 'checked' : ''}>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-medium ${task.completed ? 'text-gray-500 line-through' : 'text-gray-800'}">${task.title}</h3>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <span class="subject-badge bg-${subject.color} bg-opacity-20 text-${subject.color}">${subject.name}</span>
+                                    <span class="text-xs text-gray-500">${timeDisplay}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-xs font-medium ${getPriorityColor(task.priority)}">${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</span>
+                        </div>
+                    </div>
+                `;
+                
+                tasksContainer.appendChild(taskEl);
+                
+                // Add event listener for task checkbox
+                const checkbox = taskEl.querySelector('.task-checkbox');
+                checkbox.addEventListener('change', (e) => {
+                    e.stopPropagation();
+                    toggleTaskCompletion(task.id);
+                });
+                
+                // Add event listener for task click
+                taskEl.addEventListener('click', (e) => {
+                    if (e.target !== checkbox) {
+                        showTaskDetails(task.id);
+                    }
+                });
+            });
+        }
+
+        // Render study sessions
+        function renderStudySessions() {
+            // Filter for upcoming sessions
+            const now = new Date();
+            const upcomingSessionsList = studySessions.filter(session => {
+                const sessionDateTime = new Date(`${session.date}T${session.time}`);
+                return sessionDateTime > now;
+            }).sort((a, b) => {
+                const dateTimeA = new Date(`${a.date}T${a.time}`);
+                const dateTimeB = new Date(`${b.date}T${b.time}`);
+                return dateTimeA - dateTimeB;
+            }).slice(0, 3);
+            
+            if (upcomingSessionsList.length === 0) {
+                upcomingSessions.innerHTML = '<p class="text-gray-500 text-sm italic text-center py-2">No upcoming study sessions</p>';
+                return;
+            }
+            
+            upcomingSessions.innerHTML = '';
+            upcomingSessionsList.forEach(session => {
+                const subject = subjects.find(s => s.id === session.subject);
+                const sessionDate = new Date(`${session.date}T${session.time}`);
+                const formattedDate = sessionDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                const formattedTime = formatTime(session.time);
+                
+                const sessionEl = document.createElement('div');
+                sessionEl.className = 'p-2 rounded-md bg-white border border-gray-200';
+                sessionEl.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="subject-badge bg-${subject.color} bg-opacity-20 text-${subject.color}">${subject.name}</span>
+                            <p class="text-xs text-gray-500 mt-1">${formattedDate}, ${formattedTime} (${session.duration} min)</p>
+                        </div>
+                    </div>
+                `;
+                upcomingSessions.appendChild(sessionEl);
+            });
+        }
+
+        // Update task counts and progress
+        function updateTaskCounts() {
+            const today = new Date().toDateString();
+            const todayTasks = tasks.filter(task => new Date(task.date).toDateString() === today);
+            const completedTasks = todayTasks.filter(task => task.completed);
+            const pendingTasks = todayTasks.filter(task => !task.completed);
+            
+            document.getElementById('today-task-count').textContent = todayTasks.length;
+            document.getElementById('completed-task-count').textContent = completedTasks.length;
+            document.getElementById('pending-task-count').textContent = pendingTasks.length;
+            
+            const progressPercentage = todayTasks.length > 0 ? Math.round((completedTasks.length / todayTasks.length) * 100) : 0;
+            document.getElementById('task-progress-bar').style.width = `${progressPercentage}%`;
+            document.getElementById('task-progress-text').textContent = `${progressPercentage}% complete`;
+        }
+
+        // Update study time progress
+        function updateStudyTimeProgress() {
+            const today = new Date().toDateString();
+            const todaySessions = studySessions.filter(session => new Date(session.date).toDateString() === today);
+            const totalMinutes = todaySessions.reduce((total, session) => total + session.duration, 0);
+            const totalHours = Math.round(totalMinutes / 60 * 10) / 10;
+            
+            document.getElementById('study-time-hours').textContent = totalHours;
+            
+            // Update progress circle
+            const goalHours = 4;
+            const percentage = Math.min(totalHours / goalHours, 1);
+            const circle = document.getElementById('study-time-circle');
+            const radius = 58;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference - (percentage * circumference);
+            circle.style.strokeDasharray = `${circumference} ${circumference}`;
+            circle.style.strokeDashoffset = offset;
+        }
+
+        // Render priority tasks
+        function renderPriorityTasks() {
+            const today = new Date().toDateString();
+            const highPriorityTasks = tasks.filter(task => 
+                new Date(task.date).toDateString() === today && 
+                task.priority === 'high' && 
+                !task.completed
+            ).slice(0, 3);
+            
+            if (highPriorityTasks.length === 0) {
+                priorityTasks.innerHTML = '<p class="text-gray-500 text-sm italic text-center py-6">No high priority tasks for today</p>';
+                return;
+            }
+            
+            priorityTasks.innerHTML = '';
+            highPriorityTasks.forEach(task => {
+                const subject = subjects.find(s => s.id === task.subject);
+                const taskEl = document.createElement('div');
+                taskEl.className = 'p-3 rounded-md bg-red-50 border border-red-100';
+                
+                let timeDisplay = task.time ? formatTime(task.time) : 'Anytime';
+                
+                taskEl.innerHTML = `
+                    <h3 class="font-medium text-gray-800">${task.title}</h3>
+                    <div class="flex items-center space-x-2 mt-1">
+                        <span class="subject-badge bg-${subject.color} bg-opacity-20 text-${subject.color}">${subject.name}</span>
+                        <span class="text-xs text-gray-500">${timeDisplay}</span>
+                    </div>
+                `;
+                
+                priorityTasks.appendChild(taskEl);
+            });
+        }
+
+        // Render weekly calendar
+        function renderWeekCalendar() {
+            const weekStart = new Date(currentWeekStart);
+            const weekEnd = new Date(currentWeekStart);
+            weekEnd.setDate(weekEnd.getDate() + 6);
+            
+            // Update week range display
+            const startMonth = weekStart.toLocaleString('default', { month: 'short' });
+            const endMonth = weekEnd.toLocaleString('default', { month: 'short' });
+            const startDay = weekStart.getDate();
+            const endDay = weekEnd.getDate();
+            
+            if (startMonth === endMonth) {
+                weekRangeEl.textContent = `${startMonth} ${startDay} - ${endDay}`;
+            } else {
+                weekRangeEl.textContent = `${startMonth} ${startDay} - ${endMonth} ${endDay}`;
+            }
+            
+            // Clear calendar
+            calendarDays.innerHTML = '';
+            
+            // Generate calendar days
+            for (let i = 0; i < 7; i++) {
+                const day = new Date(weekStart);
+                day.setDate(day.getDate() + i);
+                
+                const isToday = day.toDateString() === new Date().toDateString();
+                const dayTasks = tasks.filter(task => new Date(task.date).toDateString() === day.toDateString());
+                const hasTasks = dayTasks.length > 0;
+                
+                const dayEl = document.createElement('div');
+                dayEl.className = `calendar-day flex flex-col items-center justify-center p-2 rounded-lg ${isToday ? 'active' : ''} ${hasTasks ? 'has-tasks' : ''}`;
+                dayEl.dataset.date = day.toISOString().split('T')[0];
+                
+                dayEl.innerHTML = `
+                    <span class="text-lg">${day.getDate()}</span>
+                `;
+                
+                calendarDays.appendChild(dayEl);
+                
+                // Add event listener
+                dayEl.addEventListener('click', () => {
+                    document.querySelectorAll('.calendar-day').forEach(el => el.classList.remove('active'));
+                    dayEl.classList.add('active');
+                    renderWeeklyTasks(day);
+                });
+            }
+        }
+
+        // Render weekly tasks
+        function renderWeeklyTasks(selectedDate = null) {
+            weeklyTasksContainer.innerHTML = '';
+            
+            // If no date is selected, use the first day of the current week
+            if (!selectedDate) {
+                selectedDate = new Date(currentWeekStart);
+            }
+            
+            const dateString = selectedDate.toISOString().split('T')[0];
+            const dayTasks = tasks.filter(task => task.date === dateString);
+            
+            if (dayTasks.length === 0) {
+                weeklyTasksContainer.innerHTML = `
+                    <p class="text-gray-500 text-sm italic text-center py-6">
+                        No tasks scheduled for ${selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+                    </p>
+                `;
+                return;
+            }
+            
+            // Group tasks by subject
+            const tasksBySubject = {};
+            dayTasks.forEach(task => {
+                if (!tasksBySubject[task.subject]) {
+                    tasksBySubject[task.subject] = [];
+                }
+                tasksBySubject[task.subject].push(task);
+            });
+            
+            // Render tasks by subject
+            Object.keys(tasksBySubject).forEach(subjectId => {
+                const subject = subjects.find(s => s.id === parseInt(subjectId));
+                const subjectTasks = tasksBySubject[subjectId];
+                
+                const subjectSection = document.createElement('div');
+                subjectSection.className = 'mb-4';
+                subjectSection.innerHTML = `
+                    <div class="flex items-center space-x-2 mb-2">
+                        <span class="w-3 h-3 rounded-full bg-${subject.color}"></span>
+                        <h3 class="font-medium text-gray-800">${subject.name}</h3>
+                    </div>
+                `;
+                
+                const tasksList = document.createElement('div');
+                tasksList.className = 'space-y-2 pl-5';
+                
+                subjectTasks.forEach(task => {
+                    const taskEl = document.createElement('div');
+                    taskEl.className = `p-3 rounded-lg border ${task.completed ? 'bg-gray-50 border-gray-200' : `priority-${task.priority}`}`;
+                    
+                    let timeDisplay = task.time ? formatTime(task.time) : 'Anytime';
+                    
+                    taskEl.innerHTML = `
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="flex-shrink-0">
+                                    <input type="checkbox" class="weekly-task-checkbox w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" data-id="${task.id}" ${task.completed ? 'checked' : ''}>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-medium ${task.completed ? 'text-gray-500 line-through' : 'text-gray-800'}">${task.title}</h3>
+                                    <span class="text-xs text-gray-500">${timeDisplay}</span>
+                                </div>
+                            </div>
+                            <div>
+                                <span class="text-xs font-medium ${getPriorityColor(task.priority)}">${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</span>
+                            </div>
+                        </div>
+                    `;
+                    
+                    tasksList.appendChild(taskEl);
+                });
+                
+                subjectSection.appendChild(tasksList);
+                weeklyTasksContainer.appendChild(subjectSection);
+            });
+            
+            // Add event listeners for checkboxes
+            document.querySelectorAll('.weekly-task-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', () => {
+                    toggleTaskCompletion(parseInt(checkbox.dataset.id));
+                });
+            });
+        }
+
+        // Initialize charts
+        function initCharts() {
+            // Completion rate chart
+            const completionCtx = document.getElementById('completion-chart').getContext('2d');
+            const completionChart = new Chart(completionCtx, {
+                type: 'bar',
+                data: {
+                    labels: stats.weeklyData.map(d => d.day),
+                    datasets: [
+                        {
+                            label: 'Completed',
+                            data: stats.weeklyData.map(d => d.completed),
+                            backgroundColor: '#3b82f6',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Total',
+                            data: stats.weeklyData.map(d => d.total),
+                            backgroundColor: '#e2e8f0',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+            
+            // Subject distribution chart
+            const subjectsCtx = document.getElementById('subjects-chart').getContext('2d');
+            const subjectsChart = new Chart(subjectsCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: stats.subjectHours.map(s => s.subject),
+                    datasets: [{
+                        data: stats.subjectHours.map(s => s.hours),
+                        backgroundColor: [
+                            '#3b82f6',
+                            '#ef4444',
+                            '#8b5cf6',
+                            '#10b981'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        // Update stats in progress view
+        function updateStats() {
+            document.getElementById('total-completed').textContent = stats.totalCompleted;
+            document.getElementById('total-hours').textContent = stats.totalHours;
+            document.getElementById('productivity-score').textContent = stats.productivityScore;
+            document.getElementById('current-streak').textContent = stats.currentStreak;
+        }
+
+        // Toggle task completion status
+        function toggleTaskCompletion(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                task.completed = !task.completed;
+                renderTasks();
+                renderWeeklyTasks();
+                updateTaskCounts();
+                renderPriorityTasks();
+                
+                // Show notification
+                if (task.completed) {
+                    showNotification('Task Completed', `Great job! You've completed "${task.title}"`);
+                }
+            }
+        }
+
+        // Show task details
+        function showTaskDetails(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (!task) return;
+            
+            selectedTaskId = taskId;
+            const subject = subjects.find(s => s.id === task.subject);
+            
+            document.getElementById('detail-task-title').textContent = task.title;
+            
+            const subjectBadge = document.getElementById('detail-subject-badge');
+            subjectBadge.textContent = subject.name;
+            subjectBadge.className = `px-2 py-1 rounded-full text-xs font-medium bg-${subject.color} bg-opacity-20 text-${subject.color}`;
+            
+            const priorityBadge = document.getElementById('detail-priority-badge');
+            priorityBadge.textContent = task.priority.charAt(0).toUpperCase() + task.priority.slice(1);
+            priorityBadge.className = `px-2 py-1 rounded-full text-xs font-medium ${getPriorityBadgeClass(task.priority)}`;
+            
+            const dateObj = new Date(task.date);
+            const formattedDate = dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+            const formattedTime = task.time ? formatTime(task.time) : 'Anytime';
+            document.getElementById('detail-datetime').textContent = `${formattedDate} at ${formattedTime}`;
+            
+            document.getElementById('detail-description').textContent = task.description || 'No description provided';
+            document.getElementById('detail-estimated-time').textContent = `${task.estimatedTime} minutes`;
+            
+            // Update button states
+            if (task.completed) {
+                completeTaskBtn.textContent = 'Mark Incomplete';
+                completeTaskBtn.classList.remove('bg-green-50', 'text-green-700', 'hover:bg-green-100');
+                completeTaskBtn.classList.add('bg-gray-50', 'text-gray-700', 'hover:bg-gray-100');
+            } else {
+                completeTaskBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Complete</span>
+                `;
+                completeTaskBtn.classList.remove('bg-gray-50', 'text-gray-700', 'hover:bg-gray-100');
+                completeTaskBtn.classList.add('bg-green-50', 'text-green-700', 'hover:bg-green-100');
+            }
+            
+            taskDetailsModal.classList.remove('hidden');
+        }
+
+        // Show notification
+        function showNotification(title, message) {
+            notificationTitle.textContent = title;
+            notificationMessage.textContent = message;
+            notification.classList.remove('hidden');
+            
+            // Hide after 4 seconds
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 4000);
+        }
+
+        // Helper function to format time
+        function formatTime(timeString) {
+            const [hours, minutes] = timeString.split(':');
+            const hour = parseInt(hours);
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            const formattedHour = hour % 12 || 12;
+            return `${formattedHour}:${minutes} ${ampm}`;
+        }
+
+        // Helper function to get priority color
+        function getPriorityColor(priority) {
+            switch (priority) {
+                case 'high': return 'text-red-600';
+                case 'medium': return 'text-orange-500';
+                case 'low': return 'text-green-600';
+                default: return 'text-gray-600';
+            }
+        }
+
+        // Helper function to get priority badge class
+        function getPriorityBadgeClass(priority) {
+            switch (priority) {
+                case 'high': return 'bg-red-100 text-red-700';
+                case 'medium': return 'bg-orange-100 text-orange-700';
+                case 'low': return 'bg-green-100 text-green-700';
+                default: return 'bg-gray-100 text-gray-700';
+            }
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // View buttons
+            viewTodayBtn.addEventListener('click', () => {
+                currentView = 'today';
+                updateView();
+            });
+            
+            viewWeekBtn.addEventListener('click', () => {
+                currentView = 'week';
+                updateView();
+            });
+            
+            viewProgressBtn.addEventListener('click', () => {
+                currentView = 'progress';
+                updateView();
+            });
+            
+            // Add buttons
+            addTaskBtn.addEventListener('click', () => {
+                // Set default date to today
+                document.getElementById('task-date').valueAsDate = new Date();
+                addTaskModal.classList.remove('hidden');
+            });
+            
+            addSubjectBtn.addEventListener('click', () => {
+                addSubjectModal.classList.remove('hidden');
+            });
+            
+            addSessionBtn.addEventListener('click', () => {
+                // Set default date to today
+                document.getElementById('session-date').valueAsDate = new Date();
+                addSessionModal.classList.remove('hidden');
+            });
+            
+            // Close modal buttons
+            closeModalBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    addTaskModal.classList.add('hidden');
+                    addSubjectModal.classList.add('hidden');
+                    addSessionModal.classList.add('hidden');
+                    taskDetailsModal.classList.add('hidden');
+                });
+            });
+            
+            // Color options
+            colorOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    // Remove selected class from all options
+                    colorOptions.forEach(opt => opt.classList.remove('ring-2', 'ring-offset-2', 'ring-blue-500'));
+                    // Add selected class to clicked option
+                    option.classList.add('ring-2', 'ring-offset-2', 'ring-blue-500');
+                    // Update hidden input
+                    document.getElementById('subject-color').value = option.dataset.color;
+                });
+            });
+            
+            // Form submissions
+            addTaskForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const title = document.getElementById('task-title').value;
+                const subject = parseInt(document.getElementById('task-subject').value);
+                const date = document.getElementById('task-date').value;
+                const time = document.getElementById('task-time').value;
+                const priority = document.getElementById('task-priority').value;
+                const description = document.getElementById('task-description').value;
+                const estimatedTime = parseInt(document.getElementById('task-estimated-time').value);
+                
+                const newTask = {
+                    id: tasks.length > 0 ? Math.max(...tasks.map(t => t.id)) + 1 : 1,
+                    title,
+                    subject,
+                    date,
+                    time,
+                    priority,
+                    description,
+                    estimatedTime,
+                    completed: false
+                };
+                
+                tasks.push(newTask);
+                addTaskModal.classList.add('hidden');
+                addTaskForm.reset();
+                
+                renderTasks();
+                renderWeeklyTasks();
+                updateTaskCounts();
+                renderPriorityTasks();
+                renderWeekCalendar();
+                
+                showNotification('Task Added', `"${title}" has been added to your schedule`);
+            });
+            
+            addSubjectForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const name = document.getElementById('subject-name').value;
+                const color = document.getElementById('subject-color').value;
+                
+                const newSubject = {
+                    id: subjects.length > 0 ? Math.max(...subjects.map(s => s.id)) + 1 : 1,
+                    name,
+                    color
+                };
+                
+                subjects.push(newSubject);
+                addSubjectModal.classList.add('hidden');
+                addSubjectForm.reset();
+                
+                renderSubjects();
+                showNotification('Subject Added', `"${name}" has been added to your subjects`);
+            });
+            
+            addSessionForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const subject = parseInt(document.getElementById('session-subject').value);
+                const date = document.getElementById('session-date').value;
+                const time = document.getElementById('session-time').value;
+                const duration = parseInt(document.getElementById('session-duration').value);
+                const notes = document.getElementById('session-notes').value;
+                
+                const newSession = {
+                    id: studySessions.length > 0 ? Math.max(...studySessions.map(s => s.id)) + 1 : 1,
+                    subject,
+                    date,
+                    time,
+                    duration,
+                    notes
+                };
+                
+                studySessions.push(newSession);
+                addSessionModal.classList.add('hidden');
+                addSessionForm.reset();
+                
+                renderStudySessions();
+                updateStudyTimeProgress();
+                
+                const subjectName = subjects.find(s => s.id === subject).name;
+                showNotification('Study Session Added', `${subjectName} study session scheduled for ${formatTime(time)}`);
+            });
+            
+            // Task filter and sort
+            taskFilter.addEventListener('change', renderTasks);
+            taskSort.addEventListener('change', renderTasks);
+            
+            // Week navigation
+            prevWeekBtn.addEventListener('click', () => {
+                currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+                renderWeekCalendar();
+                renderWeeklyTasks();
+            });
+            
+            nextWeekBtn.addEventListener('click', () => {
+                currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+                renderWeekCalendar();
+                renderWeeklyTasks();
+            });
+            
+            // Notification toggle
+            notificationToggle.addEventListener('click', () => {
+                showNotification('Notifications', 'You have enabled notifications for your study planner');
+            });
+            
+            // Task detail actions
+            editTaskBtn.addEventListener('click', () => {
+                // This would open the edit task form
+                taskDetailsModal.classList.add('hidden');
+                showNotification('Edit Task', 'Task editing functionality would open here');
+            });
+            
+            deleteTaskBtn.addEventListener('click', () => {
+                if (selectedTaskId) {
+                    const taskIndex = tasks.findIndex(t => t.id === selectedTaskId);
+                    if (taskIndex !== -1) {
+                        const taskTitle = tasks[taskIndex].title;
+                        tasks.splice(taskIndex, 1);
+                        taskDetailsModal.classList.add('hidden');
+                        
+                        renderTasks();
+                        renderWeeklyTasks();
+                        updateTaskCounts();
+                        renderPriorityTasks();
+                        renderWeekCalendar();
+                        
+                        showNotification('Task Deleted', `"${taskTitle}" has been removed from your schedule`);
+                    }
+                }
+            });
+            
+            completeTaskBtn.addEventListener('click', () => {
+                if (selectedTaskId) {
+                    toggleTaskCompletion(selectedTaskId);
+                    taskDetailsModal.classList.add('hidden');
+                }
+            });
+        }
+
+        // Initialize the app
+        init();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'95d7ec855237300f',t:'MTc1MjIzMjk1Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
